@@ -1,9 +1,15 @@
 package com.test.mapsdemo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -28,6 +34,46 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		init();
 		initDemoPoint();
+		initLoc();
+	}
+
+	private void initLoc() {
+		LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		criteria.setAltitudeRequired(false);
+		criteria.setBearingRequired(false);
+		criteria.setCostAllowed(true);
+		criteria.setPowerRequirement(Criteria.POWER_LOW);
+		String provider = locManager.getBestProvider(criteria, true);
+		Location location = locManager.getLastKnownLocation(provider);
+
+		if (locManager.isProviderEnabled(provider)) {
+			locManager.requestLocationUpdates(provider, 3000, 0,
+					new LocationListener() {
+
+						@Override
+						public void onStatusChanged(String provider,
+								int status, Bundle extras) {
+
+						}
+
+						@Override
+						public void onProviderEnabled(String provider) {
+
+						}
+
+						@Override
+						public void onProviderDisabled(String provider) {
+
+						}
+
+						@Override
+						public void onLocationChanged(Location location) {
+							Log.i("XXX", location.toString());
+						}
+					});
+		}
 	}
 
 	private void init() {
@@ -69,19 +115,19 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
-	
+
 	/**
-	 * 初始化一些demo点
+	 * 锟斤拷始锟斤拷一些demo锟斤拷
 	 */
 	private void initDemoPoint() {
 		final LatLng ll = new LatLng(37.339085, -121.8914807);
 		MarkerOptions mo = new MarkerOptions();
 		mo.position(ll);
 		map.addMarker(mo);
-		
-		//move to marker position.
+
+		// move to marker position.
 		CameraUpdate cu = CameraUpdateFactory.newLatLng(ll);
 		map.animateCamera(cu);
-		
+
 	}
 }
